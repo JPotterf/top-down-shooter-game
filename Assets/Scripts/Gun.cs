@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-
 public class Gun : MonoBehaviour
 {
 
@@ -24,6 +23,9 @@ public class Gun : MonoBehaviour
 	[Header("Effects")]
 	public Transform shell;
 	public Transform shellEjection;
+	public AudioClip shootAudio;
+	public AudioClip reloadAudio;
+
 	MuzzleFlash muzzleflash;
 	float nextShotTime;
 
@@ -48,8 +50,8 @@ public class Gun : MonoBehaviour
 		// animate recoil
 		transform.localPosition = Vector3.SmoothDamp(transform.localPosition, Vector3.zero, ref recoilSmoothDampVelocity, recoilMoveSettleTime);
 		recoilAngle = Mathf.SmoothDamp(recoilAngle, 0, ref recoilRotSmoothDampVelocity, recoilRotationSettleTime);
-		//transform.localEulerAngles = transform.localEulerAngles + Vector3.left * recoilAngle;
-		transform.localEulerAngles = Vector3.left * recoilAngle;
+		transform.localEulerAngles = transform.localEulerAngles + Vector3.left * recoilAngle;
+
 		if (!isReloading && projectilesRemainingInMag == 0)
 		{
 			Reload();
@@ -94,6 +96,8 @@ public class Gun : MonoBehaviour
 			transform.localPosition -= Vector3.forward * Random.Range(kickMinMax.x, kickMinMax.y);
 			recoilAngle += Random.Range(recoilAngleMinMax.x, recoilAngleMinMax.y);
 			recoilAngle = Mathf.Clamp(recoilAngle, 0, 30);
+
+			AudioManager.instance.PlaySound(shootAudio, transform.position);
 		}
 	}
 
@@ -102,6 +106,7 @@ public class Gun : MonoBehaviour
 		if (!isReloading && projectilesRemainingInMag != projectilesPerMag)
 		{
 			StartCoroutine(AnimateReload());
+			AudioManager.instance.PlaySound(reloadAudio, transform.position);
 		}
 	}
 
